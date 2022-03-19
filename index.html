@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cuprum:ital,wght@0,400;0,700;1,400&family=PT+Sans:wght@400;700&family=Roboto&display=swap"
+        rel="stylesheet">
+    <link href="style/style.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+
+<body>
+    <header class="header">
+        <p class="title">Рейтинг игроков</p>
+        <form action="#" method="get" class="search">
+            <input type="text" name="search" placeholder="Введите имя" class="search__field">
+        </form>
+    </header>
+
+    <main class="main">
+        
+        <table class="table">
+            <thead class="thead">
+                <td> </td>
+                <td>Nickname</td>
+                <td>Win</td>
+                <td>KO</td>
+                <td>Looses</td>
+                <td>PTS</td>
+                <td> </td>
+            </thead>
+            <tbody class="tbody">
+
+            </tbody>
+        </table>
+    </main>
+
+    <footer>
+        <p class="title">Добавить игрока</p>
+        <form class="add-form" action="">
+            <label>
+                <div class="label__text">
+                    Nickname
+                </div>
+                <input class="add-inp" placeholder="" type="text" name="name">
+            </label>
+            <label>
+                <div class="label__text">
+                    Win
+                </div>
+                <input class="add-inp" placeholder="" type="text" name="win">
+            </label>
+            <label>
+                <div class="label__text">
+                    KO
+                </div>
+                <input class="add-inp" placeholder="" type="text" name="ko">
+            </label>
+            <label>
+                <div class="label__text">
+                    Looses
+                </div>
+                <input class="add-inp" placeholder="" type="text" name="looses">
+            </label>
+
+            <div class="add-form__footer">
+                <input class="btn" type="submit" value="Добавить"></input>
+            </div>
+        </form>
+    </footer>
+    <script src="js/script.js"></script>
+</body>
+
+</html>
