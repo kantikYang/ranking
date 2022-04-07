@@ -32,8 +32,8 @@ const userList = [
 //расчет птс
 const countPts = (arr) => {
   arr.forEach(function (item, i, arr) {
-    //item.pts = (+item.win + +item.ko) - +item.looses;
-    arr[i].pts = (+arr[i].win + +arr[i].ko) - +arr[i].looses;
+    item.pts = (+item.win + +item.ko) - +item.looses;
+    //arr[i].pts = (+arr[i].win + +arr[i].ko) - +arr[i].looses;
   })
 };
 
@@ -42,7 +42,7 @@ const sortTable = (arr) => {
   arr.sort((a, b) => a.pts < b.pts ? 1 : -1);
 };
 
-const deleteTr = (elem,i) => {
+const deleteTr = (elem, i) => {
   elem.parentNode.remove();
   userList.splice(i, 1);
   createUser(userList);
@@ -50,6 +50,7 @@ const deleteTr = (elem,i) => {
 
 //отрисовка таблицы с новыми значениями
 const createUser = (user) => {
+
 
   tbody.innerHTML = '';
   //let newList = [user.length];
@@ -82,13 +83,18 @@ const createUser = (user) => {
 
 };
 
-//добавление нового игрока
-const addUser = (user) => {
-  userList.push(user);
+//обновление
+const start = () => {
   countPts(userList);
   sortTable(userList);
   createUser(userList);
-  console.log(userList);
+};
+
+//добавление нового игрока
+const addUser = (user) => {
+  userList.push(user);
+  start();
+  //console.log(userList);
 };
 
 //получение данных с формы
@@ -99,6 +105,27 @@ function dataForm(event) {
   addUser(user);
   event.target.reset();
 };
+
+/* const save = (i, event) => {
+  console.log(event.keyCode);
+  if (event.keyCode === 13) {
+    console.log(event.keyCode);
+    const redactName = document.querySelector('.input-name');
+    const redactWin = document.querySelector('.input-win');
+    const redactKo = document.querySelector('.input-ko');
+    const redactLooses = document.querySelector('.input-looses');
+
+    userList[i].name = redactName.value;
+    userList[i].win = redactWin.value;
+    userList[i].ko = redactKo.value;
+    userList[i].looses = redactLooses.value;
+    //console.log(userRow);
+
+    start();
+  }
+}; */
+
+
 
 //обработчик на форму
 form.addEventListener('submit', dataForm);
@@ -115,7 +142,7 @@ table.addEventListener('click', (event) => {
 
     if (event.target == deleteClient[i]) {
 
-      deleteTr(editClient[i],i);
+      deleteTr(editClient[i], i);
 
     }
 
@@ -124,63 +151,66 @@ table.addEventListener('click', (event) => {
       let userRow = editClient[i].parentNode;
       let redactList = userRow.childNodes;
 
-      
-      //Создаю инпуты
-      const redactName = document.createElement('input');
-      const redactWin = document.createElement('input');
-      const redactKo = document.createElement('input');
-      const redactLooses = document.createElement('input');
+      //console.log(redactList);
 
-      redactName.classList.add('input-name');
-      redactWin.classList.add('input-win');
-      redactKo.classList.add('input-ko');
-      redactLooses.classList.add('input-looses');
-
-      //вписываю значение в инпуты
-      redactName.value = redactList[3].innerHTML;
-      redactWin.value = redactList[5].innerHTML;
-      redactKo.value = redactList[7].innerHTML;
-      redactLooses.value = redactList[9].innerHTML;
-
-      //очищаю ячейки
-      for (let j = 3; j < 10; j += 2) {
-        redactList[j].innerHTML = '';
-      }
+      let oldName = redactList[3].innerHTML;
+      let oldWin = redactList[5].innerHTML;
+      let oldKo = redactList[7].innerHTML;
+      let oldLooses = redactList[9].innerHTML;
 
       //помещаю внутрь ячеек инпуты
-      redactList[3].append(redactName);
-      redactList[5].append(redactWin);
-      redactList[7].append(redactKo);
-      redactList[9].append(redactLooses);
+      redactList[3].innerHTML = `<input class="input-name" value = "${oldName}">`;
+      redactList[5].innerHTML = `<input class="input-win" value = "${oldWin}">`;
+      redactList[7].innerHTML = `<input class="input-ko" value = "${oldKo}">`;
+      redactList[9].innerHTML = `<input class="input-looses" value = "${oldLooses}">`;
 
-      //обрабочик на нажатие вне инпутов и кнопки редактирования
-      document.addEventListener('click', (event) => {
+      const redactName = document.querySelector('.input-name');
+      const redactWin = document.querySelector('.input-win');
+      const redactKo = document.querySelector('.input-ko');
+      const redactLooses = document.querySelector('.input-looses');
 
-        console.log(event.target);
-
-        if ( (event.target !== redactName) && (event.target !== redactWin) && (event.target !== redactKo)
-        && (event.target !== redactLooses) && (event.target !== redactClient[i])) {
+      /* function saveD(event) {
+        console.log(redactName);
+        if ((event.target !== redactName) && (event.target !== redactWin) && (event.target !== redactKo)
+          && (event.target !== redactLooses) && (event.target !== redactClient[i])) {
           //сохраняю изменения
           userList[i].name = redactName.value;
           userList[i].win = redactWin.value;
           userList[i].ko = redactKo.value;
           userList[i].looses = redactLooses.value;
-          
+          console.log(i);
           start();
         }
-      })
+      };
+      document.addEventListener('click',saveD(event));
+      document.removeEventListener('click',saveD(event));
+ */
+  
+
+
+
+       document.addEventListener('click', (event) => {
+        if ((event.target !== redactName) && (event.target !== redactWin) && (event.target !== redactKo)
+          && (event.target !== redactLooses) && (event.target !== redactClient[i])) {
+          //сохраняю изменения
+          userList[i].name = redactName.value;
+          userList[i].win = redactWin.value;
+          userList[i].ko = redactKo.value;
+          userList[i].looses = redactLooses.value;
+          start();
+        }
+      });
+
+      break;
     }
   }
+
 })
 
 
 
-//обновление
-const start = () => {
-  countPts(userList);
-  sortTable(userList);
-  createUser(userList);
-};
+
+
 
 start();
 
