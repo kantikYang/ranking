@@ -26,13 +26,13 @@ const userList = [
 //только цифры в инпут
 function valid() {
   this.value = this.value.replace(/[^\d]/g, '');
-}
+};
 
 //цифры в форме
 const formInput = document.querySelectorAll('.add-inp');
 for (let k = 1; k < formInput.length; k++) {
   formInput[k].addEventListener('keyup', valid);
-}
+};
 
 //запрет отправки 
 /* const submitBtn = document.querySelector('.btn');
@@ -61,7 +61,77 @@ const sortTable = (arr) => {
   arr.sort((a, b) => a.pts < b.pts ? 1 : -1);
 };
 
-//const inputField  = (i) =>{};
+//редактирование func
+const inputField = (i, redactButton) => {
+  console.log('ggg');
+  const row = document.getElementById(`row-${i}`);
+
+  const redactList = row.childNodes;
+
+  const oldName = redactList[3].innerHTML;
+  const oldWin = redactList[5].innerHTML;
+  const oldKo = redactList[7].innerHTML;
+  const oldLooses = redactList[9].innerHTML;
+
+  //помещаю внутрь ячеек инпуты
+  redactList[3].innerHTML = `<input data-inputs-id="changeInput" class="input-name" maxlength="14" value="${oldName}">`;
+  redactList[5].innerHTML = `<input data-inputs-id="changeInput" class="input-win" maxlength="5" value="${oldWin}">`;
+  redactList[7].innerHTML = `<input data-inputs-id="changeInput" class="input-ko" maxlength="5" value="${oldKo}">`;
+  redactList[9].innerHTML = `<input data-inputs-id="changeInput" class="input-looses" maxlength="5" value="${oldLooses}">`;
+
+  //запрет букв
+  const inputs = document.querySelectorAll('input[data-inputs-id="changeInput"]');
+  for (let k = 1; k < inputs.length; k++) {
+    inputs[k].addEventListener('keyup', valid);
+  };
+
+  //отключение кнопок
+  const allRedact = document.querySelectorAll('.redact')
+  allRedact.forEach((item, i, arr) => {
+    item.disabled = true;
+  });
+
+  //Сохранение инпутов
+  const handleClickDocument = (evt) => {
+    if (evt.target.getAttribute('data-inputs-id') === 'changeInput' || evt.target.id === `redact-${i}`) {
+      return;
+    }
+
+    //проверка ko и win
+    if (+inputs[1].value < +inputs[2].value) {
+      alert('ko не может превышать win');
+    }
+    else {
+      const inputs = document.querySelectorAll('input[data-inputs-id="changeInput"]');
+      userList[i].name = inputs[0].value || 'Аноним';
+      userList[i].win = inputs[1].value || 0;
+      userList[i].ko = inputs[2].value || 0;
+      userList[i].looses = inputs[3].value || 0;
+
+      document.removeEventListener('click', handleClickDocument);
+      start();
+    }
+
+  };
+
+  document.addEventListener('click', handleClickDocument);
+
+  redactButton.removeEventListener('click', function () { inputField(i, redactButton); });
+
+};
+
+
+
+//Удаление FUNC
+const deleteTr = (i, deleteButton) => {
+  const tr = document.getElementById(`row-${i}`); //находим нужную строку
+  tr.remove();
+  userList.splice(i, 1);
+  deleteButton.removeEventListener('click', function () { deleteTr(i, deleteButton); });
+  createUser(userList);
+}
+
+
 
 //отрисовка таблицы с новыми значениями
 const createUser = (user) => {
@@ -87,71 +157,20 @@ const createUser = (user) => {
     tbody.innerHTML += newString;
   });
 
+
+
+
+  //обработчики на удаление/редактирование
   user.forEach((_, i) => {
+
+    //редактирование
     const redactButton = document.getElementById(`redact-${i}`);
-    redactButton.addEventListener('click', () => {
-      const row = document.getElementById(`row-${i}`);
-
-      const redactList = row.childNodes;
-
-      const oldName = redactList[3].innerHTML;
-      const oldWin = redactList[5].innerHTML;
-      const oldKo = redactList[7].innerHTML;
-      const oldLooses = redactList[9].innerHTML;
-
-      //помещаю внутрь ячеек инпуты
-      redactList[3].innerHTML = `<input data-inputs-id="changeInput" class="input-name" value="${oldName}">`;
-      redactList[5].innerHTML = `<input data-inputs-id="changeInput" class="input-win" value="${oldWin}">`;
-      redactList[7].innerHTML = `<input data-inputs-id="changeInput" class="input-ko" value="${oldKo}">`;
-      redactList[9].innerHTML = `<input data-inputs-id="changeInput" class="input-looses" value="${oldLooses}">`;
-
-      //запрет букв
-      const inputs = document.querySelectorAll('input[data-inputs-id="changeInput"]');
-      for (let k = 1; k < inputs.length; k++) {
-        inputs[k].addEventListener('keyup', valid);
-      };
-
-      //отключение кнопок
-      const allRedact = document.querySelectorAll('.redact')
-      allRedact.forEach((item, i, arr) => {
-        item.disabled = true;
-      });
-
-
-      //Сохранение
-      const handleClickDocument = (evt) => {
-        if (evt.target.getAttribute('data-inputs-id') === 'changeInput' || evt.target.id === `redact-${i}`) {
-          return;
-        }
-
-        document.removeEventListener('click', handleClickDocument);
-
-        const inputs = document.querySelectorAll('input[data-inputs-id="changeInput"]');
-        userList[i].name = inputs[0].value || 'Аноним';
-        userList[i].win = inputs[1].value || 0;
-        userList[i].ko = inputs[2].value || 0;
-        userList[i].looses = inputs[3].value || 0;
-
-        start();
-      };
-      document.addEventListener('click', handleClickDocument);
-    });
-
-
+    redactButton.addEventListener('click', function () { inputField(i, redactButton); });
 
 
     //Удаление
     const deleteButton = document.getElementById(`delete-${i}`);
-
-    const deleteTr = () => {
-      const tr = document.getElementById(`row-${i}`); //находим нужную строку
-      tr.remove();
-      userList.splice(i, 1);
-      deleteButton.removeEventListener('click', deleteTr);
-      createUser(userList);
-    }
-
-    deleteButton.addEventListener('click', deleteTr);
+    deleteButton.addEventListener('click', function () { deleteTr(i, deleteButton); });
 
   });
 };
@@ -167,7 +186,6 @@ const start = () => {
 const addUser = (user) => {
   userList.push(user);
   start();
-  //console.log(userList);
 };
 
 //получение данных с формы
@@ -178,7 +196,7 @@ function dataForm(event) {
   if (user.ko > user.win) {
     alert("Число ko не может превышать win")
   }
-  else if (user.name.length < 3){
+  else if (user.name.length < 3) {
     alert("Ник должен состоять мнимум из трех символов")
   }
   else {
