@@ -1,6 +1,7 @@
 const form = document.querySelector('.add-form');
-const tbody = document.querySelector('.tbody')
-const table = document.querySelector('.table')
+const tbody = document.querySelector('.tbody');
+const table = document.querySelector('.table');
+const search = document.querySelector('.search__field');
 
 const userList = [
   {
@@ -33,19 +34,6 @@ const formInput = document.querySelectorAll('.add-inp');
 for (let k = 1; k < formInput.length; k++) {
   formInput[k].addEventListener('keyup', valid);
 };
-
-//запрет отправки 
-/* const submitBtn = document.querySelector('.btn');
-submitBtn.disabled = true;
-formInput[0].oninput = function () {
-  if (formInput[0].length > 2) {
-    console.log('ggg')
-    submitBtn.disabled = true;
-  }
-  else {
-    submitBtn.disabled = false;
-  }
-}; */
 
 
 //расчет птс
@@ -96,7 +84,6 @@ const inputField = (i, redactButton) => {
     if (evt.target.getAttribute('data-inputs-id') === 'changeInput' || evt.target.id === `redact-${i}`) {
       return;
     }
-
     //проверка ko и win
     if (+inputs[1].value < +inputs[2].value) {
       alert('ko не может превышать win');
@@ -111,7 +98,6 @@ const inputField = (i, redactButton) => {
       document.removeEventListener('click', handleClickDocument);
       start();
     }
-
   };
 
   document.addEventListener('click', handleClickDocument);
@@ -205,14 +191,27 @@ function dataForm(event) {
   event.target.reset();
 };
 
+//поиск
+search.oninput = function () {
+  
+  userList.forEach(function (user, i) {
+
+    const trHidden = document.getElementById(`row-${i}`);
+    
+    if (user.name.toLowerCase().indexOf(search.value.toLowerCase()) < 0) {
+      trHidden.classList.add("hidden");
+    }
+    else {
+      trHidden.classList.remove("hidden");
+    }
+  });
+};
 
 
 
 
 //обработчик на форму
 form.addEventListener('submit', dataForm);
-
-
 
 
 
