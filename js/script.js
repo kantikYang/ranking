@@ -1,10 +1,6 @@
-
-
-
 const form = document.querySelector('.add-form');
 const tbody = document.querySelector('.tbody')
 const table = document.querySelector('.table')
-const bg = document.querySelector('.bg-edit');
 
 const userList = [
   {
@@ -27,6 +23,29 @@ const userList = [
   }
 ];
 
+//только цифры в инпут
+function valid() {
+  this.value = this.value.replace(/[^\d]/g, '');
+}
+
+//цифры в форме
+const formInput = document.querySelectorAll('.add-inp');
+for (let k = 1; k < formInput.length; k++) {
+  formInput[k].addEventListener('keyup', valid);
+}
+
+//запрет отправки 
+/* const submitBtn = document.querySelector('.btn');
+submitBtn.disabled = true;
+formInput[0].oninput = function () {
+  if (formInput[0].length > 2) {
+    console.log('ggg')
+    submitBtn.disabled = true;
+  }
+  else {
+    submitBtn.disabled = false;
+  }
+}; */
 
 
 //расчет птс
@@ -42,45 +61,99 @@ const sortTable = (arr) => {
   arr.sort((a, b) => a.pts < b.pts ? 1 : -1);
 };
 
-const deleteTr = (elem, i) => {
-  elem.parentNode.remove();
-  userList.splice(i, 1);
-  createUser(userList);
-}
+//const inputField  = (i) =>{};
 
 //отрисовка таблицы с новыми значениями
 const createUser = (user) => {
-
-
   tbody.innerHTML = '';
-  //let newList = [user.length];
 
-  for (let i = 0; i < user.length; i++) {
-
-    const newString = `<tr>
+  user.forEach((u, i) => {
+    const newString = `<tr id="row-${i}">
     <td>
       <p class="user-id">${i + 1}</p>
     </td>
-    <td class="name">${user[i].name}</td>
-    <td class="win">${user[i].win}</td>
-    <td class="ko">${user[i].ko}</td>
-    <td class="looses">${user[i].looses}</td>
-    <td class="pts">${user[i].pts}</td>
+    <td class="name">${u.name}</td>
+    <td class="win">${u.win || 0}</td>
+    <td class="ko">${u.ko || 0}</td>
+    <td class="looses">${u.looses || 0}</td>
+    <td class="pts">${u.pts || 0}</td>
     <td class="edit">
-      <button class="redact"></button>
-      <button class="delete"></button>
+      <button data-id="redactButton" class="redact" id="redact-${i}"></button>
+      <button class="delete" id="delete-${i}"></button>
     </td>
     </tr>
-    `
+    `;
+
     tbody.innerHTML += newString;
-    //newList[i] = newString;
-  };
+  });
+
+  user.forEach((_, i) => {
+    const redactButton = document.getElementById(`redact-${i}`);
+    redactButton.addEventListener('click', () => {
+      const row = document.getElementById(`row-${i}`);
+
+      const redactList = row.childNodes;
+
+      const oldName = redactList[3].innerHTML;
+      const oldWin = redactList[5].innerHTML;
+      const oldKo = redactList[7].innerHTML;
+      const oldLooses = redactList[9].innerHTML;
+
+      //помещаю внутрь ячеек инпуты
+      redactList[3].innerHTML = `<input data-inputs-id="changeInput" class="input-name" value="${oldName}">`;
+      redactList[5].innerHTML = `<input data-inputs-id="changeInput" class="input-win" value="${oldWin}">`;
+      redactList[7].innerHTML = `<input data-inputs-id="changeInput" class="input-ko" value="${oldKo}">`;
+      redactList[9].innerHTML = `<input data-inputs-id="changeInput" class="input-looses" value="${oldLooses}">`;
+
+      //запрет букв
+      const inputs = document.querySelectorAll('input[data-inputs-id="changeInput"]');
+      for (let k = 1; k < inputs.length; k++) {
+        inputs[k].addEventListener('keyup', valid);
+      };
+
+      //отключение кнопок
+      const allRedact = document.querySelectorAll('.redact')
+      allRedact.forEach((item, i, arr) => {
+        item.disabled = true;
+      });
 
 
-  /*newList.forEach(function (item) {
-    tbody.innerHTML += item;
-  })*/
+      //Сохранение
+      const handleClickDocument = (evt) => {
+        if (evt.target.getAttribute('data-inputs-id') === 'changeInput' || evt.target.id === `redact-${i}`) {
+          return;
+        }
 
+        document.removeEventListener('click', handleClickDocument);
+
+        const inputs = document.querySelectorAll('input[data-inputs-id="changeInput"]');
+        userList[i].name = inputs[0].value || 'Аноним';
+        userList[i].win = inputs[1].value || 0;
+        userList[i].ko = inputs[2].value || 0;
+        userList[i].looses = inputs[3].value || 0;
+
+        start();
+      };
+      document.addEventListener('click', handleClickDocument);
+    });
+
+
+
+
+    //Удаление
+    const deleteButton = document.getElementById(`delete-${i}`);
+
+    const deleteTr = () => {
+      const tr = document.getElementById(`row-${i}`); //находим нужную строку
+      tr.remove();
+      userList.splice(i, 1);
+      deleteButton.removeEventListener('click', deleteTr);
+      createUser(userList);
+    }
+
+    deleteButton.addEventListener('click', deleteTr);
+
+  });
 };
 
 //обновление
@@ -102,28 +175,19 @@ function dataForm(event) {
   event.preventDefault();
   const formData = new FormData(form);
   const user = Object.fromEntries(formData.entries());
-  addUser(user);
+  if (user.ko > user.win) {
+    alert("Число ko не может превышать win")
+  }
+  else if (user.name.length < 3){
+    alert("Ник должен состоять мнимум из трех символов")
+  }
+  else {
+    addUser(user);
+  }
   event.target.reset();
 };
 
-/* const save = (i, event) => {
-  console.log(event.keyCode);
-  if (event.keyCode === 13) {
-    console.log(event.keyCode);
-    const redactName = document.querySelector('.input-name');
-    const redactWin = document.querySelector('.input-win');
-    const redactKo = document.querySelector('.input-ko');
-    const redactLooses = document.querySelector('.input-looses');
 
-    userList[i].name = redactName.value;
-    userList[i].win = redactWin.value;
-    userList[i].ko = redactKo.value;
-    userList[i].looses = redactLooses.value;
-    //console.log(userRow);
-
-    start();
-  }
-}; */
 
 
 
@@ -131,81 +195,6 @@ function dataForm(event) {
 form.addEventListener('submit', dataForm);
 
 
-table.addEventListener('click', (event) => {
-  event.preventDefault();
-
-  const editClient = document.querySelectorAll('.edit');
-  const deleteClient = document.querySelectorAll('.delete');
-  const redactClient = document.querySelectorAll('.redact');
-
-  for (let i = 0; i < editClient.length; i++) {
-
-    if (event.target == deleteClient[i]) {
-
-      deleteTr(editClient[i], i);
-
-    }
-
-    else if (event.target == (redactClient[i])) {
-
-      let userRow = editClient[i].parentNode;
-      let redactList = userRow.childNodes;
-
-      //console.log(redactList);
-
-      let oldName = redactList[3].innerHTML;
-      let oldWin = redactList[5].innerHTML;
-      let oldKo = redactList[7].innerHTML;
-      let oldLooses = redactList[9].innerHTML;
-
-      //помещаю внутрь ячеек инпуты
-      redactList[3].innerHTML = `<input class="input-name" value = "${oldName}">`;
-      redactList[5].innerHTML = `<input class="input-win" value = "${oldWin}">`;
-      redactList[7].innerHTML = `<input class="input-ko" value = "${oldKo}">`;
-      redactList[9].innerHTML = `<input class="input-looses" value = "${oldLooses}">`;
-
-      const redactName = document.querySelector('.input-name');
-      const redactWin = document.querySelector('.input-win');
-      const redactKo = document.querySelector('.input-ko');
-      const redactLooses = document.querySelector('.input-looses');
-
-      /* function saveD(event) {
-        console.log(redactName);
-        if ((event.target !== redactName) && (event.target !== redactWin) && (event.target !== redactKo)
-          && (event.target !== redactLooses) && (event.target !== redactClient[i])) {
-          //сохраняю изменения
-          userList[i].name = redactName.value;
-          userList[i].win = redactWin.value;
-          userList[i].ko = redactKo.value;
-          userList[i].looses = redactLooses.value;
-          console.log(i);
-          start();
-        }
-      };
-      document.addEventListener('click',saveD(event));
-      document.removeEventListener('click',saveD(event));
- */
-  
-
-
-
-       document.addEventListener('click', (event) => {
-        if ((event.target !== redactName) && (event.target !== redactWin) && (event.target !== redactKo)
-          && (event.target !== redactLooses) && (event.target !== redactClient[i])) {
-          //сохраняю изменения
-          userList[i].name = redactName.value;
-          userList[i].win = redactWin.value;
-          userList[i].ko = redactKo.value;
-          userList[i].looses = redactLooses.value;
-          start();
-        }
-      });
-
-      break;
-    }
-  }
-
-})
 
 
 
