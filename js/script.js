@@ -5,48 +5,47 @@ const search = document.querySelector('.search__field');
 
 const userList = [
   {
-    name: "Zuber1",
-    win: "211",
-    ko: "86",
-    looses: "112"
+    name: 'Zuber1',
+    win: '211',
+    ko: '86',
+    looses: '112',
   },
   {
-    name: "Fireball67",
-    win: "251",
-    ko: "119",
-    looses: "82"
+    name: 'Fireball67',
+    win: '251',
+    ko: '119',
+    looses: '82',
   },
   {
-    name: "Shot7",
-    win: "156",
-    ko: "130",
-    looses: "102"
-  }
+    name: 'Shot7',
+    win: '156',
+    ko: '130',
+    looses: '102',
+  },
 ];
 
 //только цифры в инпут
 function valid() {
   this.value = this.value.replace(/[^\d]/g, '');
-};
+}
 
 //цифры в форме
 const formInput = document.querySelectorAll('.add-inp');
 for (let k = 1; k < formInput.length; k++) {
   formInput[k].addEventListener('keyup', valid);
-};
-
+}
 
 //расчет птс
 const countPts = (arr) => {
   arr.forEach(function (item, i, arr) {
-    item.pts = (+item.win + +item.ko) - +item.looses;
+    item.pts = +item.win + +item.ko - +item.looses;
     //arr[i].pts = (+arr[i].win + +arr[i].ko) - +arr[i].looses;
-  })
+  });
 };
 
 //сортировка по ПТС
 const sortTable = (arr) => {
-  arr.sort((a, b) => a.pts < b.pts ? 1 : -1);
+  arr.sort((a, b) => (a.pts < b.pts ? 1 : -1));
 };
 
 //редактирование func
@@ -68,28 +67,34 @@ const inputField = (i, redactButton) => {
   redactList[9].innerHTML = `<input data-inputs-id="changeInput" class="input-looses" maxlength="5" value="${oldLooses}">`;
 
   //запрет букв
-  const inputs = document.querySelectorAll('input[data-inputs-id="changeInput"]');
+  const inputs = document.querySelectorAll(
+    'input[data-inputs-id="changeInput"]'
+  );
   for (let k = 1; k < inputs.length; k++) {
     inputs[k].addEventListener('keyup', valid);
-  };
+  }
 
   //отключение кнопок
-  const allRedact = document.querySelectorAll('.redact')
+  const allRedact = document.querySelectorAll('.redact');
   allRedact.forEach((item, i, arr) => {
     item.disabled = true;
   });
 
   //Сохранение инпутов
   const handleClickDocument = (evt) => {
-    if (evt.target.getAttribute('data-inputs-id') === 'changeInput' || evt.target.id === `redact-${i}`) {
+    if (
+      evt.target.getAttribute('data-inputs-id') === 'changeInput' ||
+      evt.target.id === `redact-${i}`
+    ) {
       return;
     }
     //проверка ko и win
     if (+inputs[1].value < +inputs[2].value) {
       alert('ko не может превышать win');
-    }
-    else {
-      const inputs = document.querySelectorAll('input[data-inputs-id="changeInput"]');
+    } else {
+      const inputs = document.querySelectorAll(
+        'input[data-inputs-id="changeInput"]'
+      );
       userList[i].name = inputs[0].value || 'Аноним';
       userList[i].win = inputs[1].value || 0;
       userList[i].ko = inputs[2].value || 0;
@@ -102,22 +107,21 @@ const inputField = (i, redactButton) => {
 
   document.addEventListener('click', handleClickDocument);
 
-  redactButton.removeEventListener('click', function () { inputField(i, redactButton); });
-
+  redactButton.removeEventListener('click', function () {
+    inputField(i, redactButton);
+  });
 };
-
-
 
 //Удаление FUNC
 const deleteTr = (i, deleteButton) => {
   const tr = document.getElementById(`row-${i}`); //находим нужную строку
   tr.remove();
   userList.splice(i, 1);
-  deleteButton.removeEventListener('click', function () { deleteTr(i, deleteButton); });
+  deleteButton.removeEventListener('click', function () {
+    deleteTr(i, deleteButton);
+  });
   createUser(userList);
-}
-
-
+};
 
 //отрисовка таблицы с новыми значениями
 const createUser = (user) => {
@@ -143,21 +147,19 @@ const createUser = (user) => {
     tbody.innerHTML += newString;
   });
 
-
-
-
   //обработчики на удаление/редактирование
   user.forEach((_, i) => {
-
     //редактирование
     const redactButton = document.getElementById(`redact-${i}`);
-    redactButton.addEventListener('click', function () { inputField(i, redactButton); });
-
+    redactButton.addEventListener('click', function () {
+      inputField(i, redactButton);
+    });
 
     //Удаление
     const deleteButton = document.getElementById(`delete-${i}`);
-    deleteButton.addEventListener('click', function () { deleteTr(i, deleteButton); });
-
+    deleteButton.addEventListener('click', function () {
+      deleteTr(i, deleteButton);
+    });
   });
 };
 
@@ -174,82 +176,38 @@ const addUser = (user) => {
   start();
 };
 
-
-
 //получение данных с формы
 function dataForm(event) {
   event.preventDefault();
   const formData = new FormData(form);
   const user = Object.fromEntries(formData.entries());
-  if (user.ko > user.win) {
-    alert("Число ko не может превышать win")
-  }
-  else if (user.name.length < 3) {
-    alert("Ник должен состоять мнимум из трех символов")
-  }
-  else {
+  if (Number(user.ko) > Number(user.win)) {
+    alert('Число ko не может превышать win');
+  } else if (user.name.length < 3) {
+    alert('Ник должен состоять мнимум из трех символов');
+  } else {
     addUser(user);
   }
   event.target.reset();
-};
-
-
+}
 
 //поиск
 search.oninput = function () {
-  
   userList.forEach(function (user, i) {
-
     const trHidden = document.getElementById(`row-${i}`);
 
     if (user.name.toLowerCase().indexOf(search.value.toLowerCase()) < 0) {
-      trHidden.classList.add("hidden");
-    }
-    else {
-      trHidden.classList.remove("hidden");
+      trHidden.classList.add('hidden');
+    } else {
+      trHidden.classList.remove('hidden');
     }
   });
 };
 
-
-
-
 //обработчик на форму
 form.addEventListener('submit', dataForm);
 
-
-
-
-
-
 start();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //удаление игрока/строки
 /* table.addEventListener('click', (event) => {
@@ -312,9 +270,6 @@ if (document.querySelector('.input-name')) {
     }
   })
 } */
-
-
-
 
 /* function upDate(i) {
   const redactName = document.querySelector('.input-name');
