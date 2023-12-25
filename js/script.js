@@ -174,6 +174,8 @@ const addUser = (user) => {
   start();
 };
 
+
+
 //получение данных с формы
 function dataForm(event) {
   event.preventDefault();
@@ -191,13 +193,15 @@ function dataForm(event) {
   event.target.reset();
 };
 
+
+
 //поиск
 search.oninput = function () {
   
   userList.forEach(function (user, i) {
 
     const trHidden = document.getElementById(`row-${i}`);
-    
+
     if (user.name.toLowerCase().indexOf(search.value.toLowerCase()) < 0) {
       trHidden.classList.add("hidden");
     }
