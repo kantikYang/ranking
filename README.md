@@ -7,3 +7,7 @@
 - Редактирование полей в таблице на месте
 - Удаление из таблицы
 - Живой поиск по таблице
+
+<img src="/images/screen.JPG" width=70%>
+
+<img src="/images/screen2.JPG" width=70%>
